@@ -76,7 +76,7 @@ export default function Currency() {
   ];
   //  Ortak CSS sınıfları
   const inputClass =
-    "w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400";
+    "w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
   const selectClass =
     "w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700";
 
@@ -96,6 +96,7 @@ export default function Currency() {
               id="amount"
               placeholder="Miktar"
               value={amount}
+              min="0"
               onChange={(e) => setAmount(e.target.value)}
               className={inputClass}
             />
@@ -162,6 +163,7 @@ export default function Currency() {
                 id="amountMobile"
                 placeholder="Miktar"
                 value={amount}
+                min="0"
                 onChange={(e) => setAmount(e.target.value)}
                 className={inputClass}
               />
