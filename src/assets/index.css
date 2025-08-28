@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Mobil cihazlarda hover efektlerini devre dışı bırak */
+@media (hover: none) and (pointer: coarse) {
+  .hover-disabled {
+    transform: none !important;
+    box-shadow: inherit !important;
+  }
+  .hover-disabled:hover {
+    transform: none !important;
+    box-shadow: inherit !important;
+    background: inherit !important;
+  }
+}
