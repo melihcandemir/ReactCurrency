@@ -1,28 +1,15 @@
-import axios from "axios";
 import { useState } from "react";
+import { exchange } from "../partner";
+import DesktopLayout from "./DesktopLayout";
+import MobileLayout from "./MobileLayout";
 
 export default function Currency() {
-  // Url
-  const URL =
-    "https://api.freecurrencyapi.com/v1/latest?apikey=fca_live_LBa940rnurxaVhJghV93BLYGb516CJWmNBHJdnhi&base_currency=";
-
-  const [FirstCurrency, setFirstCurrency] = useState("USD");
-  const [SecondCurrency, setSecondCurrency] = useState("TRY");
-  const [Conclusion, setConclusion] = useState();
+  // State yönetimi
+  const [firstCurrency, setFirstCurrency] = useState("USD");
+  const [secondCurrency, setSecondCurrency] = useState("TRY");
   const [amount, setAmount] = useState("");
+  const [result, setResult] = useState("");
   const [isSwapping, setIsSwapping] = useState(false);
-
-  const exchange = async (amount, firstCurrency, secondCurrency) => {
-    try {
-      const response = await axios.get(`${URL}${firstCurrency}`);
-      const rate = response.data.data[secondCurrency];
-      const result = rate * amount;
-      setConclusion(result.toFixed(2));
-    } catch (error) {
-      console.error("Döviz kuru alınırken hata oluştu:", error);
-      setConclusion("Hata");
-    }
-  };
 
   // Para birimlerini değiştir fonksiyonu
   const swapCurrencies = () => {
@@ -30,55 +17,25 @@ export default function Currency() {
 
     // Animasyon için kısa bir gecikme
     setTimeout(() => {
-      const tempCurrency = FirstCurrency;
-      setFirstCurrency(SecondCurrency);
+      const tempCurrency = firstCurrency;
+      setFirstCurrency(secondCurrency);
       setSecondCurrency(tempCurrency);
-      setConclusion(""); // Sonucu temizle
+      setResult(""); // Sonucu temizle
       setIsSwapping(false);
     }, 130);
   };
 
-  // Para birimleri listesi
-  const currencies = [
-    "TRY",
-    "USD",
-    "EUR",
-    "GBP",
-    "JPY",
-    "CHF",
-    "CAD",
-    "AUD",
-    "SEK",
-    "NOK",
-    "DKK",
-    "PLN",
-    "CZK",
-    "HUF",
-    "RON",
-    "BGN",
-    "HRK",
-    "RUB",
-    "CNY",
-    "INR",
-    "KRW",
-    "SGD",
-    "HKD",
-    "MXN",
-    "BRL",
-    "ZAR",
-    "THB",
-    "MYR",
-    "PHP",
-    "IDR",
-    "ILS",
-    "NZD",
-    "ISK",
-  ];
-  //  Ortak CSS sınıfları
-  const inputClass =
-    "w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
-  const selectClass =
-    "w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700";
+  // Döviz çevirme fonksiyonu
+  const handleConvert = async () => {
+    if (amount && firstCurrency && secondCurrency) {
+      const convertedResult = await exchange(
+        parseFloat(amount),
+        firstCurrency,
+        secondCurrency
+      );
+      setResult(convertedResult);
+    }
+  };
 
   return (
     <div className="w-full max-w-3xl mx-auto">
@@ -90,151 +47,36 @@ export default function Currency() {
 
         <div className="space-y-6">
           {/* Desktop Layout */}
-          <div className="hidden md:flex items-center gap-4">
-            <input
-              type="number"
-              id="amount"
-              placeholder="Miktar"
-              value={amount}
-              min="0"
-              onChange={(e) => setAmount(e.target.value)}
-              className={inputClass}
-            />
+          <DesktopLayout
+            amount={amount}
+            setAmount={setAmount}
+            firstCurrency={firstCurrency}
+            setFirstCurrency={setFirstCurrency}
+            secondCurrency={secondCurrency}
+            setSecondCurrency={setSecondCurrency}
+            result={result}
+            isSwapping={isSwapping}
+            swapCurrencies={swapCurrencies}
+          />
 
-            <select
-              id="firstCurrencyOption"
-              className={selectClass}
-              value={FirstCurrency}
-              onChange={(e) => setFirstCurrency(e.target.value)}
-            >
-              {currencies.map((currency) => (
-                <option key={currency} value={currency}>
-                  {currency}
-                </option>
-              ))}
-            </select>
-
-            {/* Swap İkonu */}
-            <svg
-              id="swapIcon"
-              onClick={swapCurrencies}
-              className={`w-50 h-12 text-gray-600 dark:text-gray-400 rotate-90 cursor-pointer transition-all duration-300 md:hover:scale-110 md:hover:text-blue-500 md:dark:hover:text-blue-400 active:scale-95 ${
-                isSwapping ? "rotate-[270deg]" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8 20V7m0 13-4-4m4 4 4-4m4-12v13m0-13 4 4m-4-4-4 4"
-              />
-            </svg>
-
-            <select
-              id="secondCurrencyOption"
-              className={selectClass}
-              value={SecondCurrency}
-              onChange={(e) => setSecondCurrency(e.target.value)}
-            >
-              {currencies.map((currency) => (
-                <option key={currency} value={currency}>
-                  {currency}
-                </option>
-              ))}
-            </select>
-
-            <input
-              type="text"
-              id="result"
-              placeholder="Sonuç"
-              value={Conclusion || ""}
-              readOnly
-              className={inputClass}
-            />
-          </div>
           {/* Mobile Layout */}
-          <div className="md:hidden space-y-4">
-            <div className="flex gap-3">
-              <input
-                type="number"
-                id="amountMobile"
-                placeholder="Miktar"
-                value={amount}
-                min="0"
-                onChange={(e) => setAmount(e.target.value)}
-                className={inputClass}
-              />
-              <select
-                id="firstCurrencyOptionMobile"
-                className={selectClass}
-                value={FirstCurrency}
-                onChange={(e) => setFirstCurrency(e.target.value)}
-              >
-                {currencies.map((currency) => (
-                  <option key={currency} value={currency}>
-                    {currency}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Mobile Swap İkonu */}
-            <div className="flex justify-center">
-              <svg
-                id="swapIconMobile"
-                onClick={swapCurrencies}
-                className={`w-50 h-8 text-gray-600 dark:text-gray-400 cursor-pointer transition-all duration-300 active:scale-95 ${
-                  isSwapping ? "rotate-[180deg]" : ""
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 20V7m0 13-4-4m4 4 4-4m4-12v13m0-13 4 4m-4-4-4 4"
-                />
-              </svg>
-            </div>
-
-            <div className="flex gap-3">
-              <select
-                id="secondCurrencyOptionMobile"
-                className={selectClass}
-                value={SecondCurrency}
-                onChange={(e) => setSecondCurrency(e.target.value)}
-              >
-                {currencies.map((currency) => (
-                  <option key={currency} value={currency}>
-                    {currency}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                id="resultMobile"
-                placeholder="Sonuç"
-                value={Conclusion || ""}
-                readOnly
-                className={inputClass}
-              />
-            </div>
-          </div>
+          <MobileLayout
+            amount={amount}
+            setAmount={setAmount}
+            firstCurrency={firstCurrency}
+            setFirstCurrency={setFirstCurrency}
+            secondCurrency={secondCurrency}
+            setSecondCurrency={setSecondCurrency}
+            result={result}
+            isSwapping={isSwapping}
+            swapCurrencies={swapCurrencies}
+          />
 
           {/* Çevir Butonu */}
           <div className="flex justify-center mt-6">
             <button
               id="convertBtn"
-              onClick={() => {
-                if (amount && FirstCurrency && SecondCurrency) {
-                  exchange(parseFloat(amount), FirstCurrency, SecondCurrency);
-                }
-              }}
+              onClick={handleConvert}
               className="bg-blue-600 dark:bg-blue-500 md:hover:bg-blue-700 md:dark:hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200 shadow-md md:hover:shadow-lg active:scale-95"
             >
               Çevir
